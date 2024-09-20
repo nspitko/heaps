@@ -196,6 +196,7 @@ class GlslOut {
 			switch( size ) {
 			case SVar(v):
 				ident(v);
+			case SConst(0):
 			case SConst(1) if( intelDriverFix ):
 				add(2);
 			case SConst(v):
@@ -219,6 +220,7 @@ class GlslOut {
 			add("[");
 			switch( size ) {
 			case SVar(v): ident(v);
+			case SConst(0):
 			case SConst(1) if( intelDriverFix ): add(2);
 			case SConst(n): add(n);
 			}
@@ -706,6 +708,8 @@ class GlslOut {
 		switch( v.kind ) {
 		case Param, Global:
 			switch( v.type ) {
+			case TBuffer(_, _, RW|RWPartial):
+				add("layout(std430) buffer ");
 			case TBuffer(_, _, kind):
 				add("layout(std140) ");
 				switch( kind ) {
@@ -849,7 +853,7 @@ class GlslOut {
 
 		if( isES )
 			decl("#version " + (version < 100 ? 100 : version) + (version > 150 ? " es" : ""));
-		else if( isCompute )
+		else if( isCompute || version >= 430 )
 			decl("#version 430");
 		else if( version != null )
 			decl("#version " + (version > 150 ? 150 : version));

@@ -275,7 +275,7 @@ class Library {
 		var lodInfos = getLODInfos( model );
 		if ( lodInfos.lodLevel > 0) {
 			for ( m in header.models )
-				if ( StringTools.contains(m.name, lodInfos.modelName) && StringTools.contains(m.name, "LOD0"))
+				if ( m.name != null && StringTools.contains(m.name, lodInfos.modelName) && StringTools.contains(m.name, "LOD0"))
 					return null;
 			throw "No LOD0 found for " + lodInfos.modelName + " in " + resource.name;
 		}
@@ -287,6 +287,10 @@ class Library {
 		p = new h3d.prim.HMDModel(header.geometries[id], header.dataPosition, this, lods);
 		p.incref(); // Prevent from auto-disposing
 		cachedPrimitives[id] = p;
+
+		if (lodInfos.lodLevel == 0)
+			h3d.prim.ModelDatabase.current.loadModelProps(model.name, p);
+
 		return p;
 	}
 
